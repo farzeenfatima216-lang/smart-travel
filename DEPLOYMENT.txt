@@ -1,0 +1,25 @@
+#!/bin/bash
+# Quick deployment link generator
+# For Netlify Drop: https://app.netlify.com/drop
+
+echo "======================================================"
+echo "SMART TRAVEL ADVISOR - DEPLOYMENT LINKS"
+echo "======================================================"
+echo ""
+echo "✅ OPTION 1: Netlify Drop (No Account Needed)"
+echo "   https://app.netlify.com/drop"
+echo "   → Drag & drop app.html → Get instant shareable link"
+echo ""
+echo "✅ OPTION 2: GitHub Pages"
+echo "   https://github.com"
+echo "   → Create repo → Upload app.html → Enable Pages"
+echo ""
+echo "✅ OPTION 3: Vercel"
+echo "   https://vercel.com"
+echo "   → Connect GitHub → Deploy automatically"
+echo ""
+echo "✅ OPTION 4: Cloudflare Pages"
+echo "   https://pages.cloudflare.com"
+echo "   → Upload files → Get domain"
+echo ""
+echo "======================================================"

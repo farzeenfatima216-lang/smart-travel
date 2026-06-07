@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Travel Advisor - AI Travel Planner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-small {
+            width: 100% !important;
+            padding: 10px !important;
+            margin-top: 15px !important;
+            font-size: 0.95em !important;
+        }
+
+        .results {
+            min-height: 300px;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .result-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-card img {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .result-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .result-card-body {
+            display: grid;
+            gap: 12px;
+        }
+
+        .destination-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef2ff;
+            color: #374151;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .match-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .result-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .reason-list {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .reason-list li {
+            list-style-position: inside;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .summary-panel {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 18px;
+            padding: 22px;
+            color: white;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.1);
+            min-height: 130px;
+        }
+
+        .summary-card h3 {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .summary-card p {
+            opacity: 0.86;
+            line-height: 1.5;
+        }
+
+        .hero-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.88), rgba(124, 58, 237, 0.84));
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 22px;
+            padding: 28px;
+            margin-bottom: 30px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+        }
+
+        .hero-copy h2 {
+            font-size: 2.4em;
+            color: #ffffff;
+            margin-bottom: 18px;
+        }
+
+        .hero-copy p {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 22px;
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .hero-buttons .btn {
+            width: auto;
+            min-width: 180px;
+        }
+
+        .hero-image {
+            border-radius: 24px;
+            overflow: hidden;
+            min-height: 360px;
+            background: linear-gradient(180deg, rgba(102,126,234,0.35), rgba(118,75,162,0.35));
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .download-btn {
+            margin-top: 18px;
+            width: auto;
+            padding: 12px 18px;
+            font-size: 0.96em;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .welcome-message i {
+            font-size: 3em;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .itinerary-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .day-plan {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #764ba2;
+            border-radius: 6px;
+        }
+
+        .day-plan h4 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .budget-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+
+        .budget-item {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .budget-item strong {
+            color: #667eea;
+        }
+
+        .trip-details {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .trip-details strong {
+            color: #667eea;
+        }
+
+        .total-budget {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .total-budget h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(10, 12, 35, 0.94);
+            backdrop-filter: blur(6px);
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .login-card {
+            width: min(460px, 100%);
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), #f8f9ff 100%);
+            border-radius: 18px;
+            padding: 32px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+        }
+
+        .login-card h2 {
+            margin-bottom: 10px;
+            color: #2b2b7a;
+            font-size: 1.9em;
+        }
+
+        .login-card p {
+            margin-bottom: 24px;
+            color: #4f4f7c;
+            line-height: 1.6;
+            font-size: 0.98em;
+        }
+
+        .login-card .login-hint {
+            margin-top: 18px;
+            color: #5f5f8e;
+            font-size: 0.92em;
+            opacity: 0.92;
+        }
+
+        .login-card .error-text {
+            margin-top: 10px;
+            color: #b02a37;
+            font-size: 0.92em;
+            min-height: 1.2em;
+        }
+
+        .remember-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .travel-tips {
+            margin-bottom: 18px;
+            background: #eef2ff;
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.18);
+            color: #2d3561;
+        }
+
+        .travel-tips h3 {
+            margin-bottom: 10px;
+            color: #3f51b5;
+        }
+
+        .travel-tips ul {
+            list-style: disc inside;
+            line-height: 1.7;
+            font-size: 0.95em;
+        }
+
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            background: rgba(102,126,234,0.14);
+            color: #2b2b7a;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        .btn-ghost {
+            background: rgba(102, 126, 234, 0.1);
+            color: #2b2b7a;
+            border: 1px solid rgba(102, 126, 234, 0.35);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(102, 126, 234, 0.18);
+        }
+
+        .admin-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            margin-bottom: 16px;
+            font-size: 1.8em;
+            color: white;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 2px solid rgba(255,255,255,0.2);
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .admin-logo:hover {
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.6);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <h2>Welcome to Smart Travel Advisor</h2>
+            <p>Login to personalize recommendations, save your preferences, and unlock travel tips tailored for you.</p>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
+                </div>
+
+                <div class="remember-group">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember me</label>
+                </div>
+
+                <button type="submit" class="btn">Login</button>
+                <p class="login-hint">Try <strong>ahmedislam / 12345678</strong>, <strong>traveler / journey123</strong>, or <strong>explorer / discover456</strong>.</p>
+                <div id="loginError" class="error-text"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="admin-logo" title="Smart Travel Advisor Admin">STA</div>
+            <h1>
+                <i class="fas fa-plane"></i>
+                Smart Travel Advisor
+            </h1>
+            <p>AI-Powered Destination Recommendations & Itinerary Planning</p>
+            <div id="userGreeting" class="welcome-badge hidden">
+                <i class="fas fa-user-circle"></i>
+                Hello, <span id="greetName">Traveler</span>
+            </div>
+        </header>
+        <div class="summary-panel">
+            <div class="summary-card">
+                <h3>1,250+</h3>
+                <p>Traveler journeys planned with smart trip recommendations and modern itinerary design.</p>
+            </div>
+            <div class="summary-card">
+                <h3>95%+</h3>
+                <p>Match accuracy based on your budget, travel type, interest and season.</p>
+            </div>
+            <div class="summary-card">
+                <h3>24/7</h3>
+                <p>Travel insights, hotel tips and itinerary guidance available whenever you plan.</p>
+            </div>
+        </div>
+
+        <div class="hero-panel">
+            <div class="hero-copy">
+                <h2>Plan smarter journeys with richer visuals and travel intelligence.</h2>
+                <p>Explore curated destinations, compare trips, and build an itinerary that looks polished and professional. The dashboard takes your preferences and transforms them into travel-ready recommendations.</p>
+                <div class="hero-buttons">
+                    <button type="button" id="startPlanBtn" class="btn">Start Planning</button>
+                    <button type="button" id="exploreBtn" class="btn btn-ghost">Explore Destinations</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80" alt="Travel destination">
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- Form Section -->
+            <div class="card">
+                <h2><i class="fas fa-search"></i> Find Destinations</h2>
+                <form id="travelForm">
+                    <div class="form-group">
+                        <label for="budget"><i class="fas fa-wallet"></i> Budget Level</label>
+                        <select id="budget" required>
+                            <option value="">-- Select Budget --</option>
+                            <option value="budget">Budget-Friendly (₹5K-₹10K)</option>
+                            <option value="mid">Mid-Range (₹15K-₹50K)</option>
+                            <option value="luxury">Luxury (>₹50K)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interest"><i class="fas fa-heart"></i> Interest</label>
+                        <select id="interest" required>
+                            <option value="">-- Select Interest --</option>
+                            <option value="culture">Culture & Heritage</option>
+                            <option value="nature">Nature & Wildlife</option>
+                            <option value="adventure">Adventure & Sports</option>
+                            <option value="spiritual">Spiritual & Religious</option>
+                            <option value="beach">Beaches & Relaxation</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="travel_type"><i class="fas fa-users"></i> Travel Type</label>
+                        <select id="travel_type" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="solo">Solo Travel</option>
+                            <option value="couple">Couple/Romantic</option>
+                            <option value="family">Family Trip</option>
+                            <option value="friends">Friends Group</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="season"><i class="fas fa-cloud-sun"></i> Season</label>
+                        <select id="season" required>
+                            <option value="">-- Select Season --</option>
+                            <option value="summer">Summer (Mar-Jun)</option>
+                            <option value="winter">Winter (Nov-Feb)</option>
+                            <option value="monsoon">Monsoon (Jul-Oct)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="travel_mood"><i class="fas fa-suitcase-rolling"></i> Travel Mood</label>
+                        <select id="travel_mood" required>
+                            <option value="">-- Choose Mood --</option>
+                            <option value="relaxing">Relaxing Escape</option>
+                            <option value="adventure">Adventure Quest</option>
+                            <option value="cultural">Cultural Journey</option>
+                            <option value="luxury">Luxury Retreat</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        <i class="fas fa-search"></i> Get Recommendations
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card">
+                <h2><i class="fas fa-star"></i> Top Destinations</h2>
+                <div id="prefSummary" class="trip-details hidden"></div>
+                <div id="tipsPanel" class="travel-tips">
+                    <h3>Travel Tips for Smart Planning</h3>
+                    <ul>
+                        <li>Book early for better hotel rates during peak seasons.</li>
+                        <li>Carry a reusable water bottle and keep local emergency contacts ready.</li>
+                        <li>Mix cultural tours with leisure days to avoid travel fatigue.</li>
+                    </ul>
+                </div>
+                <div id="results" class="results">
+                    <div class="welcome-message">
+                        <i class="fas fa-map-location-dot"></i>
+                        <p>Fill in your preferences to discover amazing destinations!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Itinerary Section -->
+        <div class="card hidden" id="itineraryContainer">
+            <h2><i class="fas fa-calendar"></i> Your Travel Itinerary</h2>
+            <div id="itinerary"></div>
+        </div>
+
+        <footer>
+            <p><i class="fas fa-heart"></i> Made with ❤️ for Travel Lovers | Travel Smart, Travel Safe!</p>
+        </footer>
+    </div>
+
+    <script>
+        // Destination Data
+        const destinationsData = {
+            recommendations: [
+                {
+                    name: "Goa",
+                    description: "Golden beaches, water sports, nightlife and Portuguese architecture",
+                    match_percentage: 92,
+                    why_recommended: ["Perfect for beach lovers", "Budget-friendly accommodation", "Great for couples"],
+                    category: "beach",
+                    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80"
+                },
+                {
+                    name: "Kerala",
+                    description: "Tranquil backwaters, houseboat cruises and lush green plantations",
+                    match_percentage: 88,
+                    why_recommended: ["Nature lover's paradise", "Family-friendly activities", "Affordable packages"],
+                    category: "nature",
+                    image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=900&q=80"
+                },
+                {
+                    name: "Jaipur",
+                    description: "The Pink City with magnificent forts, palaces and cultural heritage",
+                    match_percentage: 85,
+                    why_recommended: ["Rich cultural heritage", "Budget-friendly", "Easy accessibility"],
+                    category: "culture",
+                    image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=900&q=80"
+                },
+                {
+                    name: "Himachal Pradesh",
+                    description: "Majestic mountains, adventure sports and spectacular scenic beauty",
+                    match_percentage: 83,
+                    why_recommended: ["Thrilling adventure activities", "Perfect for nature", "Best in summer"],
+                    category: "adventure",
+                    image: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=900&q=80"
+                },
+                {
+                    name: "Varanasi",
+                    description: "Ancient spiritual city with ghats along the holy Ganges river",
+                    match_percentage: 80,
+                    why_recommended: ["Deeply spiritual experience", "Cultural significance", "Highly affordable"],
+                    category: "spiritual",
+                    image: "https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?auto=format&fit=crop&w=900&q=80"
+                }
+            ]
+        };
+
+        // Itinerary Data
+        const itineraryData = {
+            "Goa": {
+                days: 3,
+                hotels: ["Sea Breeze Resort, Baga Beach", "Casa Aventura, Anjuna"],
+                plan: [
+                    { day: 1, activity: "Arrive at Goa - Baga Beach exploration", budget: { hotel: 2000, food: 800, activities: 500, total: 3300 } },
+                    { day: 2, activity: "Water Sports & Island Visit", budget: { hotel: 2000, food: 800, activities: 1000, total: 3800 } },
+                    { day: 3, activity: "Shopping & Departure", budget: { hotel: 2000, food: 800, activities: 500, total: 3300 } }
+                ]
+            },
+            "Kerala": {
+                days: 4,
+                hotels: ["Backwater Haven Resort, Alleppey", "Tea Valley Retreat, Munnar"],
+                plan: [
+                    { day: 1, activity: "Arrive in Kochi - Fort & Chinese Fishing Nets", budget: { hotel: 1800, food: 700, activities: 400, total: 2900 } },
+                    { day: 2, activity: "Backwater Houseboat Cruise", budget: { hotel: 1800, food: 700, activities: 1200, total: 3700 } },
+                    { day: 3, activity: "Alleppey & Tea Plantations", budget: { hotel: 1800, food: 700, activities: 800, total: 3300 } },
+                    { day: 4, activity: "Leisure & Departure", budget: { hotel: 1800, food: 700, activities: 400, total: 2900 } }
+                ]
+            },
+            "Jaipur": {
+                days: 3,
+                hotels: ["Heritage Palace Hotel", "Royal Comfort Stay"],
+                plan: [
+                    { day: 1, activity: "City Palace & Jantar Mantar", budget: { hotel: 1500, food: 600, activities: 600, total: 2700 } },
+                    { day: 2, activity: "Hawa Mahal (Palace of Winds) & Markets", budget: { hotel: 1500, food: 600, activities: 700, total: 2800 } },
+                    { day: 3, activity: "Amber Fort & Departure", budget: { hotel: 1500, food: 600, activities: 600, total: 2700 } }
+                ]
+            },
+            "Himachal Pradesh": {
+                days: 4,
+                hotels: ["Hillside View Resort, Shimla", "Valley Edge Lodge, Manali"],
+                plan: [
+                    { day: 1, activity: "Arrive in Shimla - Scenic Mall Road walk", budget: { hotel: 1200, food: 500, activities: 400, total: 2100 } },
+                    { day: 2, activity: "Adventue Activities - Paragliding & Trekking", budget: { hotel: 1200, food: 500, activities: 1500, total: 3200 } },
+                    { day: 3, activity: "Manali - Rohtang Pass & Local markets", budget: { hotel: 1200, food: 500, activities: 800, total: 2500 } },
+                    { day: 4, activity: "Leisure & Departure", budget: { hotel: 1200, food: 500, activities: 400, total: 2100 } }
+                ]
+            },
+            "Varanasi": {
+                days: 3,
+                hotels: ["Ghatview Guesthouse", "Sacred Shores Retreat"],
+                plan: [
+                    { day: 1, activity: "Arrive - Evening Ghat Aarti (Prayer Ceremony)", budget: { hotel: 900, food: 400, activities: 300, total: 1600 } },
+                    { day: 2, activity: "Spiritual Tours - Temples & Ghats", budget: { hotel: 900, food: 400, activities: 500, total: 1800 } },
+                    { day: 3, activity: "Local Markets & Departure", budget: { hotel: 900, food: 400, activities: 300, total: 1600 } }
+                ]
+            }
+        };
+
+        const validCredentials = {
+            ahmedislam: '12345678',
+            traveler: 'journey123',
+            explorer: 'discover456'
+        };
+
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginError = document.getElementById('loginError');
+        const userGreeting = document.getElementById('userGreeting');
+        const greetName = document.getElementById('greetName');
+        const prefSummary = document.getElementById('prefSummary');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('savedTravelUser');
+            const remember = localStorage.getItem('rememberTravelUser') === 'true';
+
+            if (savedUser && remember) {
+                unlockApp(savedUser);
+            }
+
+            loadSavedPreferences();
+            attachHeroButtonHandlers();
+        });
+
+        function attachHeroButtonHandlers() {
+            const startBtn = document.getElementById('startPlanBtn');
+            const exploreBtn = document.getElementById('exploreBtn');
+            const formSection = document.getElementById('travelForm');
+            const resultSection = document.getElementById('results');
+
+            if (startBtn) {
+                startBtn.addEventListener('click', () => {
+                    document.getElementById('budget').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.getElementById('budget').focus();
+                });
+            }
+
+            if (exploreBtn) {
+                exploreBtn.addEventListener('click', () => {
+                    resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            loginError.textContent = '';
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if (!username || !password) {
+                loginError.textContent = 'Please enter both username and password.';
+                return;
+            }
+
+            const authResult = await authenticateUser(username, password);
+            if (authResult.success) {
+                if (rememberMe) {
+                    localStorage.setItem('savedTravelUser', authResult.username);
+                    localStorage.setItem('rememberTravelUser', 'true');
+                } else {
+                    localStorage.removeItem('rememberTravelUser');
+                }
+
+                unlockApp(authResult.username);
+            } else {
+                loginError.textContent = authResult.message || 'Login failed. Please try again.';
+            }
+        });
+
+        document.getElementById('travelForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Finding perfect destinations for you...</p></div>';
+
+            const formData = {
+                budget: document.getElementById('budget').value,
+                interest: document.getElementById('interest').value,
+                travel_type: document.getElementById('travel_type').value,
+                season: document.getElementById('season').value,
+                travel_mood: document.getElementById('travel_mood').value
+            };
+
+            saveTravelPreferences(formData);
+            showPreferenceSummary(formData);
+
+            setTimeout(() => {
+                displayRecommendations();
+            }, 1200);
+        });
+
+        const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:5000'
+            : '';
+
+        async function authenticateUser(username, password) {
+            if (validCredentials[username] && validCredentials[username] === password) {
+                return { success: true, username: username.charAt(0).toUpperCase() + username.slice(1) };
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    const payload = await response.json();
+                    return { success: true, username: payload.display_name || payload.username };
+                }
+
+                const errorPayload = await response.json();
+                return { success: false, message: errorPayload.message || 'Invalid credentials.' };
+            } catch (error) {
+                return {
+                    success: false,
+                    message: `Unable to contact login service at ${API_BASE || 'same origin'}/api/login.`
+                };
+            }
+        }
+
+        function unlockApp(user) {
+            loginOverlay.classList.add('hidden');
+            userGreeting.classList.remove('hidden');
+            greetName.textContent = user;
+        }
+
+        function loadSavedPreferences() {
+            const savedPrefs = localStorage.getItem('travelPrefs');
+            if (!savedPrefs) {
+                return;
+            }
+
+            try {
+                const prefs = JSON.parse(savedPrefs);
+                document.getElementById('budget').value = prefs.budget || '';
+                document.getElementById('interest').value = prefs.interest || '';
+                document.getElementById('travel_type').value = prefs.travel_type || '';
+                document.getElementById('season').value = prefs.season || '';
+                document.getElementById('travel_mood').value = prefs.travel_mood || '';
+                showPreferenceSummary(prefs);
+            } catch (error) {
+                console.warn('Unable to load saved preferences:', error);
+            }
+        }
+
+        function saveTravelPreferences(data) {
+            localStorage.setItem('travelPrefs', JSON.stringify(data));
+        }
+
+        function showPreferenceSummary(data) {
+            const moodText = data.travel_mood ? ` · Mood: ${capitalize(data.travel_mood)}` : '';
+            const summary = `
+                <strong>Saved selection:</strong>
+                Budget: ${capitalize(data.budget)} · Interest: ${capitalize(data.interest)} ·
+                Travel type: ${capitalize(data.travel_type)} · Season: ${capitalize(data.season)}${moodText}
+            `;
+            prefSummary.innerHTML = summary;
+            prefSummary.classList.remove('hidden');
+        }
+
+        function capitalize(value) {
+            if (!value) return '';
+            return value.toString().replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+        }
+
+        function displayRecommendations() {
+            const resultsDiv = document.getElementById('results');
+            const data = destinationsData.recommendations;
+
+            let html = '';
+            data.forEach((dest, index) => {
+                html += `
+                    <div class="result-card">
+                        <img src="${dest.image}" alt="${dest.name}">
+                        <div class="result-card-body">
+                            <div class="destination-tag"><i class="fas fa-map-marker-alt"></i> ${capitalize(dest.category)}</div>
+                            <span class="match-badge">↗️ ${dest.match_percentage}% Match</span>
+                            <h3>${dest.name}</h3>
+                            <p>${dest.description}</p>
+                            <ul class="reason-list">
+                                ${dest.why_recommended.map(reason => `<li>✓ ${reason}</li>`).join('')}
+                            </ul>
+                            <button class="btn btn-small" onclick="showItinerary('${dest.name}')">
+                                📅 Plan Trip to ${dest.name}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function showItinerary(destination) {
+            const container = document.getElementById('itineraryContainer');
+            const itineraryDiv = document.getElementById('itinerary');
+
+            const data = itineraryData[destination] || {
+                days: 3,
+                plan: [
+                    { day: 1, activity: "Arrival & Exploration", budget: { hotel: 2000, food: 800, activities: 500, total: 3300 } },
+                    { day: 2, activity: "Main Activities & Sightseeing", budget: { hotel: 2000, food: 800, activities: 1000, total: 3800 } },
+                    { day: 3, activity: "Leisure & Departure", budget: { hotel: 2000, food: 800, activities: 500, total: 3300 } }
+                ]
+            };
+
+            let totalBudget = 0;
+            let html = `
+                <div class="trip-details">
+                    <strong>📍 Destination:</strong> ${destination}<br>
+                    <strong>📅 Duration:</strong> ${data.days} Days<br>
+                    <strong>👥 Budget per person (approx)</strong>
+                </div>
+                <div class="itinerary-section">
+            `;
+
+            data.plan.forEach(day => {
+                totalBudget += day.budget.total;
+                html += `
+                    <div class="day-plan">
+                        <h4>Day ${day.day}: ${day.activity}</h4>
+                        <div class="budget-breakdown">
+                            <div class="budget-item"><strong>🏨</strong> Hotel: ₹${day.budget.hotel}</div>
+                            <div class="budget-item"><strong>🍽️</strong> Food: ₹${day.budget.food}</div>
+                            <div class="budget-item"><strong>🎯</strong> Activities: ₹${day.budget.activities}</div>
+                            <div class="budget-item"><strong>💰</strong> Day Total: ₹${day.budget.total}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (data.hotels && data.hotels.length) {
+                html += `
+                    <div class="trip-details">
+                        <strong>Recommended hotels:</strong><br>
+                        ${data.hotels.map(hotel => `• ${hotel}`).join('<br>')}
+                    </div>
+                `;
+            }
+
+            html += `
+                    </div>
+                    <div class="total-budget">
+                        <h3>💰 Total Trip Cost: ₹${totalBudget}</h3>
+                        <p>For approximately ${data.days} days of travel</p>
+                        <small style="opacity:0.9;">Per person | Please contact hotels for group discounts</small>
+                    </div>
+                    <button class="btn btn-ghost download-btn" onclick="downloadItinerary('${destination}')">Download Itinerary</button>
+                `;
+
+            itineraryDiv.innerHTML = html;
+            container.classList.remove('hidden');
+            container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function downloadItinerary(destination) {
+            const data = itineraryData[destination] || {
+                days: 3,
+                plan: [
+                    { day: 1, activity: "Arrival & Exploration", budget: { hotel: 2000, food: 800, activities: 500, total: 3300 } },
+                    { day: 2, activity: "Main Activities & Sightseeing", budget: { hotel: 2000, food: 800, activities: 1000, total: 3800 } },
+                    { day: 3, activity: "Leisure & Departure", budget: { hotel: 2000, food: 800, activities: 500, total: 3300 } }
+                ]
+            };
+
+            let content = `Travel Itinerary for ${destination}\n`;
+            content += `Duration: ${data.days} days\n\n`;
+
+            data.plan.forEach(day => {
+                content += `Day ${day.day}: ${day.activity}\n`;
+                content += `  Hotel: ₹${day.budget.hotel}, Food: ₹${day.budget.food}, Activities: ₹${day.budget.activities}, Total: ₹${day.budget.total}\n`;
+            });
+
+            if (data.hotels && data.hotels.length) {
+                content += `\nRecommended Hotels:\n`;
+                data.hotels.forEach(hotel => {
+                    content += `- ${hotel}\n`;
+                });
+            }
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${destination}-itinerary.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
